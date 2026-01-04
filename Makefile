@@ -1,5 +1,5 @@
-max: max.c
-	gcc -o max max.c
+dist/max: src/max.c
+	gcc -o dist/max src/max.c
 
 clean:
-	rm max
+	rm dist/max
