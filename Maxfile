@@ -1,0 +1,2 @@
+test=Hello@1wor@23ld
+build=gcc -o dist/max src/max.c

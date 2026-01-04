@@ -1,2 +1,0 @@
-test=echo Hello world
-cool=gcc -o test test.c

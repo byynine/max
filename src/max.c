@@ -52,31 +52,53 @@ int main(int argc, char *argv[])
                                                             //                              replaced "\n"
            
             // define argument regex
-            const char *pattern_arg = "^ *([a-zA-Z0-9 ]+)=([a-zA-Z0-9 .-]+)$";
+            const char *pattern_arg = "^ *([a-zA-Z0-9 ]+)=([/@a-zA-Z0-9 .-]+)$";
             size_t n_match_arg = 3; // 1 for full, 2 for the submatches
             regmatch_t match_arg[n_match_arg];
 
             // parse argument regex
-            int res = parse(line_buffer, n_match_arg, pattern_arg, match_arg); 
+            int arg_res = parse(line_buffer, n_match_arg, pattern_arg, match_arg); 
             
             // matched
-            if (!res)
+            if (!arg_res)
             {
                 char *ref_str = getstr(match_arg[1], line_buffer);
-                if (ref_str) {
+                if (ref_str)
+                {
                     if (!strcmp(ref_str, argv[argi])) // reference in Maxfile matches the argument
                     {
                         char *cmd_str = getstr(match_arg[2], line_buffer); // get the command that matches the reference
-                        if (cmd_str) {
+                        
+                        const char *cmd_pattern = "@([0-9]+)";
+                        regmatch_t cmd_match[2];
+                        int offset = 0;
+
+                        while (1)
+                        {
+                            int cmd_res = parse(cmd_str + offset, 2, cmd_pattern, cmd_match);
+                            if (cmd_res == REG_NOMATCH) { break; }
+                            else if (cmd_res != 0) { printf("parse error\n"); break; }
+
+                            char *arg_num = getstr(cmd_match[1], cmd_str + offset);
+                            printf("%s\n", arg_num);
+                            free(arg_num);
+
+                            offset += cmd_match[0].rm_eo;
+                        }
+
+                        if (cmd_str)
+                        {
                             printf("%s\n", cmd_str);
                             system(cmd_str); // execute command written in Maxfile
-                            free(cmd_str);
                         }
+
+                        free(cmd_str);
                     }
+
                     free(ref_str);
                 }
             }
-            else if (res == REG_NOMATCH) { printf("no match : %s\n", line_buffer); }
+            else if (arg_res == REG_NOMATCH) { printf("no match in line buffer: %s\n", line_buffer); }
             else { printf("parse error\n"); return 1; }
         }
     }
