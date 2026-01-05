@@ -1,2 +1,2 @@
-test=Hello@1wor@23ld
+test=echo hello there @1
 build=gcc -o dist/max src/max.c

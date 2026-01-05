@@ -34,6 +34,12 @@ char *getstr(    // extract a match as a string from the original input
     return match_str;
 }
 
+void substr(const char *src, size_t start, size_t len, char *dst)
+{
+    memcpy(dst, src + start, len);
+    dst[len] = '\0';
+}
+
 int main(int argc, char *argv[])
 {
     FILE *maxfile = fopen("Maxfile", "r");
@@ -44,6 +50,8 @@ int main(int argc, char *argv[])
         // read Maxfile
         char line_buffer[1024];
         rewind(maxfile); // move back read cursor to file begining for each argument iteration
+        
+        unsigned int linei = 1;
 
         while (fgets(line_buffer, sizeof(line_buffer), maxfile))
         {
@@ -67,11 +75,18 @@ int main(int argc, char *argv[])
                 {
                     if (!strcmp(ref_str, argv[argi])) // reference in Maxfile matches the argument
                     {
+                        char cmd[1024];
+                        cmd[0] = '\0';
+
                         char *cmd_str = getstr(match_arg[2], line_buffer); // get the command that matches the reference
-                        
+                        size_t cmd_len = strlen(cmd_str);
+
                         const char *cmd_pattern = "@([0-9]+)";
                         regmatch_t cmd_match[2];
-                        int offset = 0;
+                        size_t offset = 0;
+
+                        char cmd_sub[cmd_len + 1];
+                        memcpy(cmd_sub, cmd_str, cmd_len + 1);
 
                         while (1)
                         {
@@ -80,17 +95,37 @@ int main(int argc, char *argv[])
                             else if (cmd_res != 0) { printf("parse error\n"); break; }
 
                             char *arg_num = getstr(cmd_match[1], cmd_str + offset);
-                            printf("%s\n", arg_num);
+                            int abs_arg_num = argi + (int)strtol(arg_num, NULL, 10);
+                            char abs_arg_buf[12];
+
+                            if (abs_arg_num >= argc) { printf("line %d: argument out of range\n", linei); return 1; }
+                            sprintf(abs_arg_buf, "%s", argv[abs_arg_num]);
+
+                            char cmd_part[cmd_match[0].rm_so];
+                            substr(cmd_sub, offset, cmd_match[0].rm_so, cmd_part);
+
+                            strcat(cmd, cmd_part);
+                            strcat(cmd, abs_arg_buf);
+ 
                             free(arg_num);
 
                             offset += cmd_match[0].rm_eo;
                         }
 
-                        if (cmd_str)
-                        {
-                            printf("%s\n", cmd_str);
-                            system(cmd_str); // execute command written in Maxfile
-                        }
+                        size_t end_len = strlen(cmd_sub) - offset;
+
+                        char cmd_part[end_len + 1]; // if this ends with a @n it includes a newline
+                        substr(cmd_sub, offset, end_len, cmd_part);
+                        strcat(cmd, cmd_part);
+                        
+                        printf("%s\n", cmd);
+                        system(cmd);
+                        
+                        // if (cmd_str)
+                        // {
+                        //     printf("%s\n", cmd_str);
+                        //     system(cmd_str); // execute command written in Maxfile
+                        // }
 
                         free(cmd_str);
                     }
@@ -100,6 +135,8 @@ int main(int argc, char *argv[])
             }
             else if (arg_res == REG_NOMATCH) { printf("no match in line buffer: %s\n", line_buffer); }
             else { printf("parse error\n"); return 1; }
+            
+            linei++;
         }
     }
 
