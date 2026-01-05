@@ -1,2 +1,3 @@
+test=echo @1 
 build=gcc -o @1 @1.c
 clean=rm test test.c

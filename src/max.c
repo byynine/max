@@ -3,6 +3,8 @@
 #include <string.h>
 #include <regex.h>
 
+char version[] = "v1.0.0d";
+
 int parse(    // parse a string by a regex pattern and output the match
     const char input[],
     size_t n_match,
@@ -40,9 +42,37 @@ void substr(const char *src, size_t start, size_t len, char *dst)
     dst[len] = '\0';
 }
 
+int cmdopts(int argc, char *argv[], char **maxfile_path)
+{
+    for (int argi = 0; argi < argc; argi++)
+    {
+        if (strcmp(argv[argi], "-m") == 0 || strcmp(argv[argi], "--maxfile") == 0)
+        {
+            if (argi + 1 < argc)
+            {
+                *maxfile_path = argv[argi + 1];
+            }
+            else { printf("argument option missing\n"); return 1; }
+        }
+        else if (strcmp(argv[argi], "-v") == 0 || strcmp(argv[argi], "--version") == 0)
+        {
+            printf("%s\n", version);
+            return 2;
+        }
+    }
+
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
-    FILE *maxfile = fopen("Maxfile", "r");
+    char *maxfile_path = "Maxfile";
+
+    int resopts = cmdopts(argc, argv, &maxfile_path);
+    if (resopts) { return 1; }
+    else if (resopts == 2) { return 0; }
+
+    FILE *maxfile = fopen(maxfile_path, "r");
     if (!maxfile) { printf("Maxfile not found\n"); return 1; }
     
     for (int argi = 1; argi < argc; argi++)
