@@ -12,7 +12,8 @@ SRC = \
     src/max.c \
     src/module/parser/parser.c \
     src/module/cmdopts/cmdopts.c \
-    src/module/version/version.c
+    src/module/version/version.c \
+	src/module/usage/usage.c
 
 BIN = dist/max$(EXE)
 

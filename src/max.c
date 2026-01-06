@@ -15,9 +15,11 @@ size_t n_match_arg = 3; // 1 for full, 2 for the submatches
 
 int main(int argc, char *argv[])
 {    
+    if (argc == 1) {}
     // command-line options
     int resopts = cmdopts(argc, argv, &maxfile_path);
-    if (resopts == 2) { return 0; }
+    if (resopts == 3) { return 0; }
+    else if (resopts == 2) { return 0; }
     else if (resopts != 0) { return 1; }
 
     FILE *maxfile = fopen(maxfile_path, "r");
