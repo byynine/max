@@ -4,6 +4,7 @@
 #include <regex.h>
 
 #include "module/cmdopts/cmdopts.h"
+#include "module/parser/parser.h"
 
 // default Maxfile path, modifiable by the -m/--maxfile option
 char *maxfile_path = "Maxfile";
@@ -15,21 +16,6 @@ size_t n_match_arg = 3; // 1 for full, 2 for the submatches
 // @n pattern
 const char *cmd_pattern = "@([0-9]+)";
 size_t n_cmd_match = 2;
-
-int parse(    // parse a string by a regex pattern and output the match
-    const char input[],
-    size_t n_match,
-    const char *pattern,
-    regmatch_t *match
-)
-{
-    regex_t re;
-    if (regcomp(&re, pattern, REG_EXTENDED)) { printf("regex compile failure\n"); return 1; }
-    int res = regexec(&re, input, n_match, match, 0);
-    regfree(&re);
-
-    return res;
-}
 
 char *getstr(    // extract a match as a string from the original input
     regmatch_t match,
