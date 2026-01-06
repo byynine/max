@@ -3,5 +3,5 @@ const char *usage = "Usage: max [options] command ...\n"
                     "Options:\n"
                     "  -h, --help              print this text and exit\n"
                     "  -v, --version           print current version and exit\n"
-                    "  -m, --maxfile <path>    specify maxfile path\n";
+                    "  -m, --maxfile <path>    specify Maxfile path\n";
  

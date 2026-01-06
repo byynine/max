@@ -5,6 +5,7 @@
 
 #include "module/cmdopts/cmdopts.h"
 #include "module/parser/parser.h"
+#include "module/usage/usage.h"
 
 // default Maxfile path
 char *maxfile_path = "Maxfile";
@@ -15,7 +16,8 @@ size_t n_match_arg = 3; // 1 for full, 2 for the submatches
 
 int main(int argc, char *argv[])
 {    
-    if (argc == 1) {}
+    if (argc == 1) { printf("%s", usage); return 1; }
+
     // command-line options
     int resopts = cmdopts(argc, argv, &maxfile_path);
     if (resopts == 3) { return 0; }
