@@ -3,7 +3,7 @@
 #include <string.h>
 #include <regex.h>
 
-char version[] = "v1.0.0d";
+char version[] = "v1.0.1d";
 
 // default Maxfile path, modifiable by the -m/--maxfile option
 char *maxfile_path = "Maxfile";
