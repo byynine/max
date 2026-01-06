@@ -1,4 +1,4 @@
-CC ?= gcc
+CC := gcc
 EXE :=
 RM := rm -f
 
