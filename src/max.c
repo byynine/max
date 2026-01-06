@@ -6,25 +6,16 @@
 #include "module/cmdopts/cmdopts.h"
 #include "module/parser/parser.h"
 
-// default Maxfile path, modifiable by the -m/--maxfile option
+// default Maxfile path
 char *maxfile_path = "Maxfile";
 
 // define argument regex pattern
 const char *pattern_arg = "^ *([a-zA-Z0-9 ]+)=([/@a-zA-Z0-9 .-]+)$";
 size_t n_match_arg = 3; // 1 for full, 2 for the submatches
 
-// @n pattern
-const char *cmd_pattern = "@([0-9]+)";
-size_t n_cmd_match = 2;
-
-void substr(const char *src, size_t start, size_t len, char *dst)
-{
-    memcpy(dst, src + start, len);
-    dst[len] = '\0';
-}
-
 int main(int argc, char *argv[])
 {    
+    // command-line options
     int resopts = cmdopts(argc, argv, &maxfile_path);
     if (resopts == 2) { return 0; }
     else if (resopts != 0) { return 1; }
@@ -38,7 +29,7 @@ int main(int argc, char *argv[])
         char line_buffer[1024];
         rewind(maxfile); // move back read cursor to file begining for each argument iteration
         
-        unsigned int linei = 1;
+        unsigned int linei = 1; // line index counter for printing purposes
 
         while (fgets(line_buffer, sizeof(line_buffer), maxfile))
         {
@@ -46,9 +37,8 @@ int main(int argc, char *argv[])
                                                             //                              ^
                                                             //                              replaced "\n"
 
-            regmatch_t match_arg[n_match_arg];
-
             // parse argument regex
+            regmatch_t match_arg[n_match_arg];
             int arg_res = parse(line_buffer, n_match_arg, pattern_arg, match_arg); 
             
             // matched
@@ -59,51 +49,15 @@ int main(int argc, char *argv[])
                 {
                     if (!strcmp(ref_str, argv[argi])) // reference in Maxfile matches the argument
                     {
-                        char cmd[1024];
+                        char cmd[1024]; // command that will be executed
                         cmd[0] = '\0';
 
                         char *cmd_str = getstr(match_arg[2], line_buffer); // get the command that matches the reference
                         size_t cmd_len = strlen(cmd_str);
 
-                        // @n feature
-                        regmatch_t cmd_match[n_cmd_match];
-                        size_t offset = 0;
+                        // @n parse
+                        atnparse(argc, argv, argi, linei, cmd_str, cmd_len, cmd);
 
-                        char cmd_sub[cmd_len + 1];
-                        memcpy(cmd_sub, cmd_str, cmd_len + 1);
-
-                        // iteration for finding @n and concatenating it
-                        while (1)
-                        {
-                            int cmd_res = parse(cmd_str + offset, n_cmd_match, cmd_pattern, cmd_match);
-                            if (cmd_res == REG_NOMATCH) { break; }
-                            else if (cmd_res != 0) { printf("parse error\n"); break; }
-
-                            char *arg_num = getstr(cmd_match[1], cmd_str + offset);
-                            int abs_arg_num = argi + (int)strtol(arg_num, NULL, 10);
-                            char abs_arg_buf[12];
-
-                            if (abs_arg_num >= argc) { printf("line %d: argument out of range\n", linei); return 1; }
-                            sprintf(abs_arg_buf, "%s", argv[abs_arg_num]);
-
-                            char cmd_part[cmd_match[0].rm_so];
-                            substr(cmd_sub, offset, cmd_match[0].rm_so, cmd_part);
-
-                            strcat(cmd, cmd_part);
-                            strcat(cmd, abs_arg_buf);
- 
-                            free(arg_num);
-
-                            offset += cmd_match[0].rm_eo;
-                        }
-
-                        // @n iteration doesnt include the last cmd_part, so do one more after the iteration ends
-                        size_t end_len = strlen(cmd_sub) - offset;
-                        char cmd_part[end_len + 1]; // if this ends with a @n it includes a newline
-
-                        substr(cmd_sub, offset, end_len, cmd_part);
-                        strcat(cmd, cmd_part);
-                        
                         // print and execute the final constructed command
                         printf("%s\n", cmd);
                         system(cmd);
