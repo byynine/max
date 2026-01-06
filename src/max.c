@@ -5,6 +5,17 @@
 
 char version[] = "v1.0.0d";
 
+// default Maxfile path, modifiable by the -m/--maxfile option
+char *maxfile_path = "Maxfile";
+
+// define argument regex pattern
+const char *pattern_arg = "^ *([a-zA-Z0-9 ]+)=([/@a-zA-Z0-9 .-]+)$";
+size_t n_match_arg = 3; // 1 for full, 2 for the submatches
+
+// @n pattern
+const char *cmd_pattern = "@([0-9]+)";
+size_t n_cmd_match = 2;
+
 int parse(    // parse a string by a regex pattern and output the match
     const char input[],
     size_t n_match,
@@ -65,9 +76,7 @@ int cmdopts(int argc, char *argv[], char **maxfile_path)
 }
 
 int main(int argc, char *argv[])
-{
-    char *maxfile_path = "Maxfile";
-
+{    
     int resopts = cmdopts(argc, argv, &maxfile_path);
     if (resopts) { return 1; }
     else if (resopts == 2) { return 0; }
@@ -88,10 +97,7 @@ int main(int argc, char *argv[])
             line_buffer[strcspn(line_buffer, "\n")] = '\0'; // line_buffer = "Hello, world!\0\0";
                                                             //                              ^
                                                             //                              replaced "\n"
-           
-            // define argument regex
-            const char *pattern_arg = "^ *([a-zA-Z0-9 ]+)=([/@a-zA-Z0-9 .-]+)$";
-            size_t n_match_arg = 3; // 1 for full, 2 for the submatches
+
             regmatch_t match_arg[n_match_arg];
 
             // parse argument regex
@@ -111,16 +117,17 @@ int main(int argc, char *argv[])
                         char *cmd_str = getstr(match_arg[2], line_buffer); // get the command that matches the reference
                         size_t cmd_len = strlen(cmd_str);
 
-                        const char *cmd_pattern = "@([0-9]+)";
-                        regmatch_t cmd_match[2];
+                        // @n feature
+                        regmatch_t cmd_match[n_cmd_match];
                         size_t offset = 0;
 
                         char cmd_sub[cmd_len + 1];
                         memcpy(cmd_sub, cmd_str, cmd_len + 1);
 
+                        // iteration for finding @n and concatenating it
                         while (1)
                         {
-                            int cmd_res = parse(cmd_str + offset, 2, cmd_pattern, cmd_match);
+                            int cmd_res = parse(cmd_str + offset, n_cmd_match, cmd_pattern, cmd_match);
                             if (cmd_res == REG_NOMATCH) { break; }
                             else if (cmd_res != 0) { printf("parse error\n"); break; }
 
@@ -142,20 +149,16 @@ int main(int argc, char *argv[])
                             offset += cmd_match[0].rm_eo;
                         }
 
+                        // @n iteration doesnt include the last cmd_part, so do one more after the iteration ends
                         size_t end_len = strlen(cmd_sub) - offset;
-
                         char cmd_part[end_len + 1]; // if this ends with a @n it includes a newline
+
                         substr(cmd_sub, offset, end_len, cmd_part);
                         strcat(cmd, cmd_part);
                         
+                        // print and execute the final constructed command
                         printf("%s\n", cmd);
                         system(cmd);
-                        
-                        // if (cmd_str)
-                        // {
-                        //     printf("%s\n", cmd_str);
-                        //     system(cmd_str); // execute command written in Maxfile
-                        // }
 
                         free(cmd_str);
                     }
