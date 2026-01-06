@@ -33,43 +33,37 @@ int main(int argc, char *argv[])
 
         while (fgets(line_buffer, sizeof(line_buffer), maxfile))
         {
-            line_buffer[strcspn(line_buffer, "\n")] = '\0'; // line_buffer = "Hello, world!\0\0";
-                                                            //                              ^
-                                                            //                              replaced "\n"
+            line_buffer[strcspn(line_buffer, "\n")] = '\0'; // replace \n with null terminator
 
             // parse argument regex
             regmatch_t match_arg[n_match_arg];
             int arg_res = parse(line_buffer, n_match_arg, pattern_arg, match_arg); 
-            
-            // matched
-            if (!arg_res)
-            {
-                char *ref_str = getstr(match_arg[1], line_buffer);
-                if (ref_str)
-                {
-                    if (!strcmp(ref_str, argv[argi])) // reference in Maxfile matches the argument
-                    {
-                        char cmd[1024]; // command that will be executed
-                        cmd[0] = '\0';
 
-                        char *cmd_str = getstr(match_arg[2], line_buffer); // get the command that matches the reference
-                        size_t cmd_len = strlen(cmd_str);
+            if (arg_res == REG_NOMATCH) { printf("no match in line buffer: %s\n", line_buffer); continue; } // no match
+            else if (arg_res) { printf("parse error\n"); return 1; } // parse error
 
-                        // @n parse
-                        atnparse(argc, argv, argi, linei, cmd_str, cmd_len, cmd);
+            char *ref_str = getstr(match_arg[1], line_buffer);
+            if (!ref_str) { printf("error getting reference string"); return 1; }
 
-                        // print and execute the final constructed command
-                        printf("%s\n", cmd);
-                        system(cmd);
+            // compare reference and current argument. if it's not 0 (matched) then skip
+            if (strcmp(ref_str, argv[argi])) { continue; }
 
-                        free(cmd_str);
-                    }
+            char cmd[1024]; // command that will be executed
+            cmd[0] = '\0';
 
-                    free(ref_str);
-                }
-            }
-            else if (arg_res == REG_NOMATCH) { printf("no match in line buffer: %s\n", line_buffer); }
-            else { printf("parse error\n"); return 1; }
+            char *cmd_str = getstr(match_arg[2], line_buffer); // get the command that matches the reference
+            size_t cmd_len = strlen(cmd_str);
+
+            // @n parse
+            atnparse(argc, argv, argi, linei, cmd_str, cmd_len, cmd);
+
+            // print and execute the final constructed command
+            printf("%s\n", cmd);
+            system(cmd);
+
+            // cleanup
+            free(cmd_str);
+            free(ref_str);
             
             linei++;
         }
