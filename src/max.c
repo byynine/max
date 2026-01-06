@@ -3,7 +3,7 @@
 #include <string.h>
 #include <regex.h>
 
-char version[] = "v1.0.1d";
+#include "module/cmdopts/cmdopts.h"
 
 // default Maxfile path, modifiable by the -m/--maxfile option
 char *maxfile_path = "Maxfile";
@@ -53,33 +53,11 @@ void substr(const char *src, size_t start, size_t len, char *dst)
     dst[len] = '\0';
 }
 
-int cmdopts(int argc, char *argv[], char **maxfile_path)
-{
-    for (int argi = 0; argi < argc; argi++)
-    {
-        if (strcmp(argv[argi], "-m") == 0 || strcmp(argv[argi], "--maxfile") == 0)
-        {
-            if (argi + 1 < argc)
-            {
-                *maxfile_path = argv[argi + 1];
-            }
-            else { printf("argument option missing\n"); return 1; }
-        }
-        else if (strcmp(argv[argi], "-v") == 0 || strcmp(argv[argi], "--version") == 0)
-        {
-            printf("%s\n", version);
-            return 2;
-        }
-    }
-
-    return 0;
-}
-
 int main(int argc, char *argv[])
 {    
     int resopts = cmdopts(argc, argv, &maxfile_path);
-    if (resopts) { return 1; }
-    else if (resopts == 2) { return 0; }
+    if (resopts == 2) { return 0; }
+    else if (resopts != 0) { return 1; }
 
     FILE *maxfile = fopen(maxfile_path, "r");
     if (!maxfile) { printf("Maxfile not found\n"); return 1; }
