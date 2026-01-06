@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <regex.h>
 
 #include "parser.h"
@@ -16,4 +18,20 @@ int parse(    // parse a string by a regex pattern and output the match
     regfree(&re);
 
     return res;
+}
+
+char *getstr(    // extract a match as a string from the original input
+    regmatch_t match,
+    char *org_input
+)
+{
+    int len = match.rm_eo - match.rm_so;
+    
+    char *match_str = malloc(len + 1);
+    if (!match_str) { return NULL; }
+
+    memcpy(match_str, org_input + match.rm_so, len);
+    match_str[len] = '\0';
+    
+    return match_str;
 }

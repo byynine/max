@@ -17,22 +17,6 @@ size_t n_match_arg = 3; // 1 for full, 2 for the submatches
 const char *cmd_pattern = "@([0-9]+)";
 size_t n_cmd_match = 2;
 
-char *getstr(    // extract a match as a string from the original input
-    regmatch_t match,
-    char *org_input
-)
-{
-    int len = match.rm_eo - match.rm_so;
-    
-    char *match_str = malloc(len + 1);
-    if (!match_str) { return NULL; }
-
-    memcpy(match_str, org_input + match.rm_so, len);
-    match_str[len] = '\0';
-    
-    return match_str;
-}
-
 void substr(const char *src, size_t start, size_t len, char *dst)
 {
     memcpy(dst, src + start, len);
