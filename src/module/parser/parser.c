@@ -42,7 +42,7 @@ int atnparse(    // perform @n parse on cmd
     char *cmd
 )
 {
-    const char *cmd_pattern = "@([0-9]+)";
+    const char *cmd_pattern = "@(-?[0-9]+)";
     size_t n_cmd_match = 2;
 
     // @n feature
@@ -65,7 +65,7 @@ int atnparse(    // perform @n parse on cmd
         int abs_arg_num = argi + (int)strtol(arg_num, NULL, 10);
         char abs_arg_buf[12];
 
-        if (abs_arg_num >= argc) { printf("line %d: argument out of range\n", linei); return 1; }
+        if (abs_arg_num < 0 || abs_arg_num >= argc) { printf("line %d: argument out of range\n", linei); return 1; }
         sprintf(abs_arg_buf, "%s", argv[abs_arg_num]);
 
         char cmd_part[cmd_match[0].rm_so];
