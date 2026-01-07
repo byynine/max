@@ -46,26 +46,25 @@ int main(int argc, char *argv[])
             if (arg_res == REG_NOMATCH) { printf("no match in line buffer: %s\n", line_buffer); continue; } // no match
             else if (arg_res) { printf("parse error\n"); return 1; } // parse error
 
-            char *ref_str = getstr(match_arg[1], line_buffer);
+            char *ref_str = getstr(match_arg[1], line_buffer); // turn match_arg[1] into string
             if (!ref_str) { printf("error getting reference string"); return 1; }
 
             // compare reference and current argument. if it's not 0 (matched) then skip
             if (strcmp(ref_str, argv[argi])) { continue; }
 
-            char cmd[1024]; // command that will be executed
-            cmd[0] = '\0';
-
             char *cmd_str = getstr(match_arg[2], line_buffer); // get the command that matches the reference
             size_t cmd_len = strlen(cmd_str);
 
-            // @n parse
+            char cmd[1024]; // command that will be executed
+            cmd[0] = '\0';
+
+            // @n parse on cmd
             atnparse(argc, argv, argi, linei, cmd_str, cmd_len, cmd);
 
             // print and execute the final constructed command
             printf("%s\n", cmd);
             system(cmd);
 
-            // cleanup
             free(cmd_str);
             free(ref_str);
             
