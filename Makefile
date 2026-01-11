@@ -4,11 +4,11 @@ RM := rm -f
 MKDIR := mkdir -p
 
 SRC = \
-    src/linux/max.c \
-    src/linux/module/parser/parser.c \
-    src/linux/module/cmdopts/cmdopts.c \
-    src/linux/module/version/version.c \
-    src/linux/module/usage/usage.c
+    src/max.c \
+    src/module/parser/parser.c \
+    src/module/cmdopts/cmdopts.c \
+    src/module/version/version.c \
+    src/module/usage/usage.c
 
 ifeq ($(OS),Windows_NT)
     EXE := .exe
@@ -16,7 +16,7 @@ ifeq ($(OS),Windows_NT)
     MKDIR := mkdir
     CC := gcc
 	SRC = \
-		  src/win/max.c \
+		  srcwin/max.c \
 		  src/win/module/parser/parser.c \
 		  src/win/module/cmdopts/cmdopts.c \
 		  src/win/module/version/version.c \

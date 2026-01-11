@@ -38,7 +38,8 @@ max=echo success
 This default entry runs only when the argument count is 1.
 
 # Installation
-Installation on MacOS or Windows platforms have not been tested yet, but should be compatible.
+
+Installation on MacOS or Windows platforms are not supported yet.
 
 ## Linux
 
