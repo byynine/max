@@ -23,6 +23,18 @@ hello
 ```
 The @n syntax allows you to specify if a command takes an argument. This number is relative and can be zero, a negative, or positive integer.
 
+**max** iterates over all arguments when ran, so in such case:
+
+```bash
+$ max
+```
+This would run normally and look for a reference in **Maxfile** that would match **max**.
+Naturally a *default* entry can be made that will execute when simply running `$ max`. The **Maxfile** will look something like this:
+
+```Maxfile
+max=echo success
+```
+
 # Installation
 Installation on MacOS or Windows platforms have not been tested yet, but should be compatible.
 

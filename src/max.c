@@ -16,7 +16,7 @@ size_t n_match_arg = 3; // 1 for full, 2 for the submatches
 
 int main(int argc, char *argv[])
 {    
-    if (argc == 1) { printf("%s", usage); return 1; }
+    // if (argc == 1) { printf("%s", usage); return 1; }
 
     // command-line options
     int resopts = cmdopts(argc, argv, &maxfile_path);
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     FILE *maxfile = fopen(maxfile_path, "r");
     if (!maxfile) { printf("Maxfile not found\n"); return 1; }
     
-    for (int argi = 1; argi < argc; argi++)
+    for (int argi = 0; argi < argc; argi++)
     {
         // read Maxfile
         char line_buffer[1024];
