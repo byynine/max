@@ -1,4 +1,4 @@
-**max** is designed to be an intuitive and easy to use interpreter and command executor.
+**max** is designed to be an intuitive and easy to use command executor.
 It can be used for building programs or simple automation of tasks.
 
 *This is a development version, do not expect complete, bugless features and ease of use.*
