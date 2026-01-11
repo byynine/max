@@ -35,6 +35,8 @@ Naturally a *default* entry can be made that will execute when simply running `$
 max=echo success
 ```
 
+This default entry runs only when the argument count is 1.
+
 # Installation
 Installation on MacOS or Windows platforms have not been tested yet, but should be compatible.
 

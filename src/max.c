@@ -29,6 +29,8 @@ int main(int argc, char *argv[])
     
     for (int argi = 0; argi < argc; argi++)
     {
+        if (argi == 0 && argc != 1) { continue; }
+
         // read Maxfile
         char line_buffer[1024];
         rewind(maxfile); // move back read cursor to file begining for each argument iteration
