@@ -76,4 +76,21 @@ expected argument
 $ max main sick
 sick cool
 ```
+---
 
+```Maxfile
+def variable mycoolvalue
+ref coolbuild
+cmd echo variable
+```
+
+```Maxfile
+def variable mycoolvalue
+
+def bref ref coolbuild
+def ref build
+
+def cmd1 cmd echo variable
+
+lnk build cmd1 
+```

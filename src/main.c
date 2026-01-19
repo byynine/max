@@ -3,15 +3,14 @@
 
 const char maxfile_path[] = "res/Maxfile";
 
-int process(char *buf, FILE *file)
+int process(char *lbuf, FILE *file)
 {
-    if (!strchr(buf, '\n') && !feof(file))
+    if (!strchr(lbuf, '\n') && !feof(file))
     {
-        fprintf(stderr, "line too long\n");
-        return 1;
+        printf("line too long\n");
+        return -1;
     }
-    buf[strcspn(buf, "\n")] = '\0';
-    return strlen(buf);
+    return strlen(lbuf);
 }
 
 int main()
@@ -19,16 +18,20 @@ int main()
     FILE *maxfile = fopen(maxfile_path, "r");
     if (!maxfile) { printf("error opening %s\n", maxfile_path); return 1; }
 
-    char buf[1024];
-    while (fgets(buf, sizeof(buf), maxfile))
+    char lbuf[1024];
+    while (fgets(lbuf, sizeof(lbuf), maxfile))
     {
-        int len = process(buf, maxfile);
-        if (len == 1) { return 1; }
+        int len = process(lbuf, maxfile);
+        if (len == -1) { return 1; }
 
-        // test { echo hello }
-        // cool { echo cool }
+        for (int i = 0; i < len; i++)
+        {
+            char c = lbuf[i];
+        }
 
-        printf("%d\n", len);
+        // var variable mycoolvalue
+        // ref test
+        // cmd echo variable
     }
 
     fclose(maxfile);
