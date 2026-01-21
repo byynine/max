@@ -28,10 +28,6 @@ int main()
         {
             char c = lbuf[i];
         }
-
-        // var variable mycoolvalue
-        // ref test
-        // cmd echo variable
     }
 
     fclose(maxfile);
